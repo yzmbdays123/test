@@ -1,6 +1,6 @@
 import sys
 import os
-s=sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+s=sys.path.append('/usr/local/test/jingli_game')
 print(sys.path)
 # import os
 # path = r'../core'
@@ -70,9 +70,12 @@ while True:
     # time_now = time.strftime("%H:%M:%S", time.localtime())
     now = datetime.now()
     hour = now.hour
+    print(hour)
     if hour in [9,10,11,13,14]:
+        print('开市了')
         content = bankuaizhangdie() + "\n" +shangzheng()
         title = 'this is test title'
+        print(title)
         m = send_email(username,password,rec,title,content,file)
         m.send_msg()
         print("hello")
@@ -80,6 +83,8 @@ while True:
         print(ss)
         time.sleep(600)
     else:
+        print('还没有开市哦')
         time.sleep(3598)
+
 
 
