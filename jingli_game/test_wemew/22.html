@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+<title>微信设置_粉丝</title>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta name="keywords" content="酒吧霸屏,霸屏,微喵,微猫,酒吧微信,酒吧社交,酒吧互动,酒吧玩家社群,酒吧营销,酒吧公众号,wemew,酒吧微信运营,酒吧互动娱乐,专注酒吧互动娱乐（酒吧霸屏原创）">
+<meta name="description" content="微喵，专注酒吧互动娱乐社交，是酒吧霸屏、打赏的创造者，为上百万用户提供创新的娱乐现场互动产品。">
+<meta property="qc:admins" content="130135734567326375" />
+<meta property="wb:webmaster" content="572497fa9151188c" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<link rel="shortcut icon" type="image/x-icon" href="https://img.wemew.com/wemew/images/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="https://img.wemew.com/wemew/admin/style/basic.css?r=1023168"/>
+<link rel="stylesheet" type="text/css" href="https://img.wemew.com/wemew/admin/style/icon.css?r=1023168"/>
+<link  rel="stylesheet" type="text/css" href="https://img.wemew.com/wemew/admin/wmJS/css/wm.css?r=1023168"/>
+<script  type="text/javascript" src="https://img.wemew.com/wemew/admin/js/jquery-1.10.2.min.js"></script>
+<script  type="text/javascript" src="https://img.wemew.com/wemew/admin/wmJS/js/wm.js?r=1023168"></script>
+<script  type="text/javascript" src="https://img.wemew.com/wemew/admin/js/highcharts.js?r=1023168"></script>
+<script src="https://img.wemew.com/wemew/wechat/js/userHandleCount_mobile.js?r=1023168"></script>
+<style>
+html{overflow:hidden}
+*{color:#6a6a6a; font-size:13px;}
+.userHead{width:40px; height:40px;}
+.tip{background:#f3f3f3;-moz-border-radius:4px;-o-border-radius:4px;-webkit-border-radius:4px; border-radius:4px; padding:5px 10px; margin-left:10px; position:relative; font-size:12px; color:#a79d96; display:inline-block;}
+.tip i{width:0px; height:0px; display:inline-block; 
+border-bottom:6px solid transparent;border-top:6px solid transparent; border-left:6px solid #f3f3f3;font-size:0px; line-height:0px; position:absolute; left:-6px; top:7px;-moz-transform:rotate(-180deg); -o-transform:rotate(-180deg); -webkit-transform:rotate(-180deg); border-transform:rotate(-180deg);}
+</style>
+<script>
+var edit = function(e){
+	var html = '备注<br /><input style="width:335px" placeholder="备注" type="text" class="input" value="'+$(e.parentNode.parentNode).find('td')[6].innerHTML+'" />';
+	window.top.WM.get({
+		type:'window',
+		title:'编辑备注',
+		innerHTML:html,
+		ready:function(){
+			$(this.find('.input')[0]).focus();
+		},
+		onload:function(){
+			var inputs = this.find('.input');
+			for(var i=0;i<inputs.length;i++)
+				WM.bindEnter(inputs[i],this.getButton()[1]);	
+		},
+		click:function(b){
+			if(!b)
+				return this.close();
+			WM.setButton(this.getButton()[1],false,'处理中');
+			var self = this;
+			var val = this.find('input').val();
+			ajax_edit($(e.parentNode.parentNode).attr('tid'),val,function(){
+				showInfo('编辑成功');
+				$(e.parentNode.parentNode).find('td')[6].innerHTML = val;
+				self.close();		
+			},function(errorMsg){
+				self.close();	
+				showInfo(errorMsg||'操作失败');
+			});				
+		}
+	});	
+}
+$(function(){
+	var _page = new WM.page('pageBox','2','56');
+	_page.onChange = function(x){
+		window.location.href="/admin/searchfans?nickname=&page="+x;
+	}
+	WM.bindEnter($('#searchInput')[0],$('#toSearch')[0]);
+	if($('.table tr').length==1){
+		var isSearch = 'true';
+		isSearch = isSearch==null?false:(isSearch=='true'?true:isSearch);
+		var s = '没有对应查询条件的记录';
+		if(!isSearch)
+			$('.searchTable').hide(),s = '没有粉丝';
+		$('.textMini.textD2').hide();
+		$('<div class="textD3 notOpen"><span class="icon_notOpen"></span><br /><br />'+s+'</div>').appendTo($('.table').parent());
+		$('.tableAction').hide();
+	}
+});
+var ajax_edit = function(tid,val,fn1,fn2){
+	//编辑 val-备注	
+	$.post("/admin/editUserRemarks",{userid:tid,remarks:val},function(data){
+		if(data.isResultTrue){
+			fn1();
+		}else{
+			fn2(data.resultMsg);
+		}
+	});	
+}
+//搜索
+var toSearch = function(){
+	//$('#searchInput').val()-查询的参数
+	//本页面跳转
+	/*
+	注意：跳转时候 url加入参数forSearch=true
+	*/
+	var nickName = $('#searchInput').val();
+	nickName = $.trim(nickName);
+	if(nickName!=null&&nickName!=""){
+		window.location.href="/admin/searchfans?forSearch=true&nickname="+$('#searchInput').val();
+	}else{
+		showInfo('请输入用户昵称');
+	}
+}
+</script>
+</head> 
+
+<body>
+<div>
+    <table class="searchTable" style="width:100%;">
+        <tr>
+            <td align="left" style="position:relative">
+            	<b>1118个用户，男567人，女551人</b>
+            </td>
+            <td align="right">
+            	<!--搜索的时候 这里的value要回填-->
+            	<input id="searchInput" style="width:250px;" type="text" class="input leftRadius" placeholder="输入用户昵称" /><a class="btnNormal rightRadius bgGreen"  onclick="toSearch(this)" id="toSearch">搜索</a>
+            </td>
+        </tr>
+    </table>
+	<div>
+        <table class="table" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <th width="10%">头像</th>
+                <th width="20%">昵称</th>
+                <th width="20%">openID</th>
+                <th width="10%">性别</th>
+                <th width="10%">城市</th>
+                <th width="10%">手机号</th>
+                <th width="30%">备注</th>
+                <th width="20%">操作</th>
+            </tr>
+            	
+           	
+	           	 <tr tid="c761a41d-bfa6-4d5c-a78e-84e7c1f3ce67">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-01-26-17/154849663389670578.jpg?x-oss-process=style/100" /></td>
+	                <td>炯炯</td>
+	                <td>ofQZpwOV2EUpqk6WVMvs1RZ4oOwk</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="dc8f0681-c238-4b2c-b6f8-5faea5ffd86d">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-04-17-14/155548306972816886.jpg?x-oss-process=style/100" /></td>
+	                <td>じòぴé * *</td>
+	                <td>ofQZpwLenTMMpOpZiNC5uW4cQYak</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="dcd330e3-31ad-4c0c-85d3-71ded6f2e79b">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-12-06-11/157560155897059413.jpg?x-oss-process=style/100" /></td>
+	                <td>小易1</td>
+	                <td>ofQZpwF1bL3wKMAllVs0qWFaLtFQ</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>新疆乌鲁木齐</td>
+	                <td>13281082556</td>
+	                <td>b</td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="6d600120-0c90-4ecc-add5-3005c3433f45">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-07-04-19/156223973710614099.jpg?x-oss-process=style/100" /></td>
+	                <td>Cathham</td>
+	                <td>ofQZpwAOQbnTLam-9l2HIl_AKUec</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td>15680535079</td>
+	                <td>1</td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="c52a7e47-7e1b-477a-91bb-b832b8d5cc11">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2017-11-30-21/151204867533132333.jpg?x-oss-process=style/100" /></td>
+	                <td>顺</td>
+	                <td>ofQZpwAzl0v7gfgqx24dCqzsLfFw</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="fb5a7a88-7c27-4dd8-a353-53432c1324ab">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2018-10-24-10/154034811650672637.jpg?x-oss-process=style/100" /></td>
+	                <td>Ruby</td>
+	                <td>ofQZpwLqCPEF3VTDVmZB3XLQOcDw</td>
+	                <td>
+	                
+	                	
+	                	
+	                		<span class="icon_woman"></span>
+	                	
+	                
+	                </td>
+	                <td></td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="ecc6a9c0-767b-4edc-a7b5-48fb02fe67ee">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2018-12-17-10/154501393107597289.jpg?x-oss-process=style/100" /></td>
+	                <td>神奇海螺</td>
+	                <td>ofQZpwOFaY8lscCaHRdbffboyXYA</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>伊丽莎白港</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="b64fb654-e579-4cef-9d74-c71a5b45aeb6">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-05-29-18/155912487489985628.jpg?x-oss-process=style/100" /></td>
+	                <td>December</td>
+	                <td>ofQZpwIFfRZokXu-TRgXi0M6IQuo</td>
+	                <td>
+	                
+	                	
+	                	
+	                		<span class="icon_woman"></span>
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="c28f3821-75f9-49c2-a0fd-7253c17fd815">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-04-30-15/155660784803634683.jpg?x-oss-process=style/100" /></td>
+	                <td>野原广志</td>
+	                <td>ofQZpwEFoFu03IUpJykxX-Eh1xw0</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>浙江杭州</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="9d4190a3-c91a-4fba-bd70-77c247b679ec">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-01-23-18/154824024536148085.jpg?x-oss-process=style/100" /></td>
+	                <td>前尘再怀念</td>
+	                <td>ofQZpwPHup40Aagqy_tDUSjF9-2g</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="3909a9d4-5ce8-48c2-92f8-efbf995c4b47">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2018-04-25-14/152463843565822816.jpg?x-oss-process=style/100" /></td>
+	                <td>Asher</td>
+	                <td>ofQZpwDGig1JclmmgEYe2rhmM0Qg</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="69669c49-ef31-4db4-9b91-3cd41f60d87b">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-04-17-19/155550091500786377.jpg?x-oss-process=style/100" /></td>
+	                <td>王樊</td>
+	                <td>ofQZpwLN3zqzdNjj7rFLMNA6fqcg</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="bddb0ce7-1d11-45c5-aa37-ec6b74760d3b">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-03-19-10/155296208769501367.jpg?x-oss-process=style/100" /></td>
+	                <td>lili</td>
+	                <td>ofQZpwGgBpnYH2uw8hRN4mJcZAHw</td>
+	                <td>
+	                
+	                	
+	                	
+	                		<span class="icon_woman"></span>
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="d0fbef13-3447-41ef-b431-65f083d00265">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2018-09-05-14/153612783735857542.jpg?x-oss-process=style/100" /></td>
+	                <td>醒</td>
+	                <td>ofQZpwO3VA_cXS0g1Oj9V-U2-_TU</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="07d8d66a-a451-447d-83b4-26f181b75d13">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2018-11-14-17/154218869225413769.jpg?x-oss-process=style/100" /></td>
+	                <td>W先生</td>
+	                <td>ofQZpwDlEh9vzfgDV21rPIHBhOAQ</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="a5481a93-429e-4e7f-b4c4-08c7ed22eae9">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-10-15-10/157110690802798680.jpg?x-oss-process=style/100" /></td>
+	                <td>娇媚的小坏蛋</td>
+	                <td>ofQZpwFw-q2evBG2W0ytDcCP9HGA</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>四川南充</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="9f5546b8-7041-431c-b881-f5d5fe2a988a">
+	                <td><img class="userHead" src="https://wemew.oss-cn-qingdao.aliyuncs.com/2019-09-10-18/156811116352549795.jpg?x-oss-process=style/100" /></td>
+	                <td>Leon_</td>
+	                <td>ofQZpwKjlYbucvMZcbRjB0GKr_UU</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>黑龙江大兴安岭</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="927f1e0c-a60b-41b2-99f2-99d447be0085">
+	                <td><img class="userHead" src="http://wemew.oss-cn-qingdao.aliyuncs.com/2016-11-02-08/147804794510639930.jpg?x-oss-process=style/100" /></td>
+	                <td>King</td>
+	                <td>ofQZpwHsub-LK58rtyRjZ57_0Rlk</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>北京</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="2af80e99-fb74-4169-888e-feff5796fe14">
+	                <td><img class="userHead" src="http://wemew.oss-cn-qingdao.aliyuncs.com/2017-03-03-10/148850832067435246.jpg?x-oss-process=style/100" /></td>
+	                <td>虫子同学</td>
+	                <td>ofQZpwAcBSJSbpWAYJoZAZLiD3F8</td>
+	                <td>
+	                
+	                	
+	                	
+	                		<span class="icon_woman"></span>
+	                	
+	                
+	                </td>
+	                <td>四川成都</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+	           	 <tr tid="60b0eaa3-b4d1-4ea8-bfad-fa48bca89155">
+	                <td><img class="userHead" src="http://wemew.oss-cn-qingdao.aliyuncs.com/2018-01-14-23/151594232332163830.jpg?x-oss-process=style/100" /></td>
+	                <td>小皇帝</td>
+	                <td>ofQZpwALE1l4ZMCxaRRt8IARZCrM</td>
+	                <td>
+	                
+	                	
+	                		<span class="icon_man"></span>
+	                	
+	                	
+	                
+	                </td>
+	                <td>浙江台州</td>
+	                <td></td>
+	                <td></td>
+	                <td>
+	                    <a class="iconCtrl edit" title="编辑" onclick="edit(this)"></a>
+	                </td>
+	            </tr>
+           	
+          
+        </table>
+	</div>
+	<div id="pageBox" style="margin-top:15px;"></div>
+
+</div>
+</body>
+</html>

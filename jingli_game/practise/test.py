@@ -1,5 +1,7 @@
-
-
+import sys
+import os
+s=sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+print(sys.path)
 # import os
 # path = r'../core'
 # for filename in os.listdir(path):
@@ -63,16 +65,21 @@ password = 'umeblcelhkajfjbi'
 rec = '838214651@qq.com'
 file = './test.mp4'
 import time
+from datetime import datetime
 while True:
-    time_now = time.strftime("%H:%M:%S", time.localtime())  # 刷新
-    if time_now == "23:39:30": #此处设置每天定时的时间
+    # time_now = time.strftime("%H:%M:%S", time.localtime())
+    now = datetime.now()
+    hour = now.hour
+    if hour in [9,10,11,13,14]:
         content = bankuaizhangdie() + "\n" +shangzheng()
         title = 'this is test title'
         m = send_email(username,password,rec,title,content,file)
         m.send_msg()
-        # 此处3行替换为需要执行的动作
         print("hello")
-        subject = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 定时发送测试"
-        print(subject)
-        time.sleep(2)
+        ss = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + " 定时发送测试"
+        print(ss)
+        time.sleep(600)
+    else:
+        time.sleep(3598)
+
 

@@ -62,6 +62,7 @@ username = '1193723749@qq.com'
 password = 'umeblcelhkajfjbi'
 rec = '838214651@qq.com'
 file = './test.mp4'
+
 content = bankuaizhangdie() + "\n" +shangzheng()
 title = 'this is test title'
 m = send_email(username,password,rec,title,content,file)

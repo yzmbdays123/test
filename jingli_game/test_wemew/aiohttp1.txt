@@ -1,0 +1,13 @@
+/wxLoginUserInfo
+/cwechat/getMyBagV2
+/cwechat/getmostonwalldatalist
+/loadMoreweionwallMsgs
+/cwechat/newSongsGroupByArtist
+/cwechat/first/popWindowAndBanner
+/cwechat/getWeiXinSHare
+/cwechat/isNoScreen
+/cwechat/first/popWindowAndBanner
+/cwechat/goodSongList
+/cwechat/getAchieves
+/cwechat/richDataPush
+/toFindGameInfo
